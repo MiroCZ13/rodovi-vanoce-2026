@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rodovi – Naše Vánoce 2026 🎄</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #fff7df;
+      font-family: Georgia, serif;
+      background:
+        radial-gradient(ellipse at top, #286047 0%, transparent 65%),
+        #09271e;
+      min-height: 100vh;
+    }
+    .snow {
+      position: fixed; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, white 90%, transparent),
+        radial-gradient(2px 2px at 90px 120px, white 90%, transparent),
+        radial-gradient(3px 3px at 180px 70px, white 90%, transparent);
+      background-size: 230px 180px;
+      animation: snow 12s linear infinite;
+      opacity: .55;
+    }
+    @keyframes snow { to { background-position: 0 180px; } }
+    header { text-align: center; padding: 38px 18px 20px; }
+    .brand { color: #e5ce8a; letter-spacing: 5px; font-size: 12px; }
+    h1 { font-size: clamp(30px, 6vw, 48px); margin: 15px 0; }
+    .motto { font-style: italic; line-height: 1.7; color: #e2e8dd; }
+    main { max-width: 900px; margin: auto; padding: 18px; }
+    .panel {
+      border: 1px solid #bda66b88;
+      border-radius: 22px;
+      background: #103b2dcc;
+      padding: 25px;
+      box-shadow: 0 15px 45px #0003;
+      margin-bottom: 22px;
+    }
+    h2 { color: #ecd69a; font-size: 24px; }
+    .people {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 12px; margin-top: 22px;
+    }
+    button, input, textarea {
+      font: inherit; border-radius: 12px; padding: 13px;
+    }
+    button {
+      cursor: pointer; border: 1px solid #d5bc7b;
+      background: #e7d39b; color: #173b2b;
+    }
+    button:hover { filter: brightness(1.08); }
+    .person { background: #194b37; color: #fff5d8; min-height: 90px; }
+    .person span { display: block; font-size: 26px; margin-bottom: 7px; }
+    .selected { outline: 2px solid #e7d39b; }
+    input, textarea {
+      width: 100%; margin: 6px 0 12px;
+      background: #09271e; border: 1px solid #527560;
+      color: white;
+    }
+    label { display: block; color: #e5d5a6; font-size: 14px; }
+    .wish {
+      border: 1px solid #54745d; border-radius: 14px;
+      padding: 15px; margin: 12px 0; background: #0c3024;
+    }
+    .tag {
+      display: inline-block; border-radius: 30px; padding: 6px 10px;
+      background: #e7d39b; color: #173b2b; font: 12px Arial, sans-serif;
+      margin-top: 9px;
+    }
+    .muted { color: #cad9ca; font-size: 14px; line-height: 1.6; }
+    .hidden { display: none; }
+    footer { text-align: center; padding: 20px; color: #d9c994; font-size: 13px; }
+    @media (max-width: 480px) {
+      .people { grid-template-columns: 1fr 1fr; }
+      .panel { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="snow"></div>
+<header>
+  <div class="brand">✦ RODOVI ✦</div>
+  <h1>Naše Vánoce 2026 🎄</h1>
+  <p class="motto">To nejkrásnější na Vánocích je,<br>že je můžeme prožívat spolu.</p>
+</header>
+<main>
+  <section class="panel" id="welcome">
+    <h2>Vítejte u nás doma. ❤️</h2>
+    <p class="muted">Máme tu další Vánoce, další společné momenty prožité s naší krásnou rodinou a pár přání, která by nám pod stromečkem vykouzlila úsměv. 😀</p>
+    <p>🎁 Pojďme Ježíškovi trochu napovědět.</p>
+    <h2>Čí přání dnes objevíme? 🎅</h2>
+    <p class="muted">Vyber člena rodiny a podívej se, co by mu letos udělalo radost. 🤩</p>
+    <div class="people" id="people"></div>
+    <p class="muted">✨ Ať jsou letošní Vánoce plné radosti, překvapení a hlavně ať jsme všichni zdraví.</p>
+  </section>
+
+  <section class="panel hidden" id="wishlist">
+    <button onclick="goHome()">← Zpět k rodině</button>
+    <h2 id="listTitle"></h2>
+    <p class="muted">Malá inspirace pro Ježíška. 🎅</p>
+    <div id="wishList"></div>
+    <button onclick="showForm()">＋ Přidat přání</button>
+    <p class="muted">Každé přání začíná malým nápadem.</p>
+    <div id="formArea" class="hidden">
+      <h2>Co by ti pod stromečkem udělalo radost? 🎁</h2>
+      <form id="wishForm">
+        <label>Název přání<input id="wishName" required></label>
+        <label>Odkaz na dárek<input id="wishLink" type="url" placeholder="https://..."></label>
+        <label>Fotka produktu<input id="wishPhoto" type="url" placeholder="Odkaz na obrázek (volitelné)"></label>
+        <label>Poznámka<textarea id="wishNote" rows="2"></textarea></label>
+        <label>Přibližná cena (Kč)<input id="wishPrice" type="number" min="0"></label>
+        <button type="submit">Uložit přání</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer>Největší kouzlo Vánoc není o dárcích, ale o momentech strávených s rodinou. ❤️<br><br>Rodovi • Naše Vánoce 2026</footer>
+<script>
+const family = [
+  {name:"Míša", icon:"⚽"},
+  {name:"Péťa", icon:"☕"},
+  {name:"Pavlínka", icon:"🏋️"},
+  {name:"Míša Jr.", icon:"🎮"}
+];
+let current = null;
+let wishes = [];
+const people = document.getElementById("people");
+family.forEach(person => {
+  const button = document.createElement("button");
+  button.className = "person";
+  button.innerHTML = `<span>${person.icon}</span>${person.name}`;
+  button.onclick = () => openList(person.name);
+  people.appendChild(button);
+});
+function openList(name) {
+  current = name;
+  document.getElementById("welcome").classList.add("hidden");
+  document.getElementById("wishlist").classList.remove("hidden");
+  document.getElementById("listTitle").textContent = "Vánoční přání pro " + name + " 👈";
+  renderWishes();
+}
+function goHome() {
+  document.getElementById("wishlist").classList.add("hidden");
+  document.getElementById("welcome").classList.remove("hidden");
+  document.getElementById("formArea").classList.add("hidden");
+}
+function showForm() {
+  document.getElementById("formArea").classList.toggle("hidden");
+}
+function renderWishes() {
+  const list = document.getElementById("wishList");
+  const mine = wishes.filter(w => w.for === current);
+  list.innerHTML = "";
+  if (!mine.length) {
+    list.innerHTML = '<p class="muted">Zatím tu nic není. 🎅<br>Přidej první přání a začni psát letošní vánoční seznam.</p>';
+    return;
+  }
+  mine.forEach(w => {
+    const card = document.createElement("div");
+    card.className = "wish";
+    const title = document.createElement("strong");
+    title.textContent = w.name;
+    card.appendChild(title);
+    if (w.note) {
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.textContent = w.note;
+      card.appendChild(note);
+    }
+    if (w.price) {
+      const price = document.createElement("p");
+      price.className = "muted";
+      price.textContent = "Přibližná cena: " + w.price + " Kč";
+      card.appendChild(price);
+    }
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = "✍️ Přidal/a: " + w.author;
+    card.appendChild(tag);
+    if (w.link) {
+      const link = document.createElement("p");
+      const a = document.createElement("a");
+      a.href = w.link; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = "Otevřít dárek ↗"; a.style.color = "#e7d39b";
+      link.appendChild(a); card.appendChild(link);
+    }
+    if (w.photo) {
+      const img = document.createElement("img");
+      img.src = w.photo; img.alt = w.name;
+      img.style.cssText = "max-width:100%;max-height:220px;border-radius:12px;margin-top:12px";
+      card.appendChild(img);
+    }
+    list.appendChild(card);
+  });
+}
+document.getElementById("wishForm").addEventListener("submit", event => {
+  event.preventDefault();
+  wishes.push({
+    for: current, author: current,
+    name: document.getElementById("wishName").value.trim(),
+    link: document.getElementById("wishLink").value.trim(),
+    photo: document.getElementById("wishPhoto").value.trim(),
+    note: document.getElementById("wishNote").value.trim(),
+    price: document.getElementById("wishPrice").value
+  });
+  event.target.reset();
+  document.getElementById("formArea").classList.add("hidden");
+  alert("Přání dorazilo k Ježíškovi! 🎅");
+  renderWishes();
+});
+</script>
+</body>
+</html>
