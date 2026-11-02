@@ -19,13 +19,15 @@ h2{color:#ecd69a;font-size:23px}
 main{max-width:900px;margin:auto;padding:18px}
 .panel{border:1px solid #bda66b88;border-radius:22px;background:#103b2dcc;padding:25px;box-shadow:0 15px 45px #0003;margin-bottom:22px}
 .people{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:22px}
-button,input,textarea{font:inherit;border-radius:12px;padding:13px}
+button,input,textarea,select{font:inherit;border-radius:12px;padding:13px}
 button{cursor:pointer;border:1px solid #d5bc7b;background:var(--gold);color:#173b2b;transition:.2s}
 button:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .person{background:#194b37;color:#fff5d8;min-height:100px;font-size:17px}
 .person span{display:block;font-size:28px;margin-bottom:8px}
 .selected{outline:2px solid var(--gold)}
-input,textarea{width:100%;margin:6px 0 12px;background:#09271e;border:1px solid #527560;color:white}
+input,textarea,select{width:100%;margin:6px 0 12px;background:#09271e;border:1px solid #527560;color:white}
+select option{background:#09271e;color:white}
+button:disabled{opacity:.6;cursor:wait}
 label{display:block;color:#e5d5a6;font-size:14px}
 .muted{color:var(--muted);font-size:14px;line-height:1.7}
 .hidden{display:none!important}
@@ -53,311 +55,112 @@ footer{text-align:center;padding:25px 18px;color:#d9c994;font-size:13px;line-hei
  <p class="motto">To nejkrásnější na Vánocích je,<br>že je můžeme prožívat spolu.</p>
 </header>
 <main>
-<section class="panel" id="identity">
- <h2>Kdo právě dorazil? 🎄</h2>
- <p class="muted">Vyber sebe, ať víme, komu patří přání.</p>
- <div class="people" id="identityPeople"></div>
- <p class="small">Tento výběr se uloží v tomto prohlížeči. ❤️</p>
-</section>
-
-<section class="panel hidden" id="welcome">
- <div class="topbar">
-  <span class="tag" id="currentBadge"></span>
-  <button class="secondary" onclick="changePerson()">Změnit osobu ↔</button>
+<section class="panel" id="authPanel">
+ <h2>Rodinný vánoční seznam 🎄</h2>
+ <p class="muted">Přihlas se ke svému účtu. Přání se pak bezpečně sdílí s rodinou napříč zařízeními.</p>
+ <div class="actions" style="margin-bottom:16px">
+  <button type="button" id="showLogin">Přihlášení</button>
+  <button type="button" class="secondary" id="showSignup">Vytvořit účet</button>
  </div>
+ <form id="loginForm">
+  <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
+  <label>Heslo<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required></label>
+  <button type="submit">Přihlásit se</button>
+ </form>
+ <form id="signupForm" class="hidden">
+  <label>Jméno v rodině<select id="signupName" required>
+   <option value="">Vyber své jméno</option><option>Míša</option><option>Péťa</option><option>Pavlínka</option><option>Míša Jr.</option>
+  </select></label>
+  <label>E-mail<input id="signupEmail" type="email" autocomplete="email" required></label>
+  <label>Heslo (alespoň 6 znaků)<input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+  <button type="submit">Vytvořit účet</button>
+  <p class="small">Po registraci může být potřeba potvrdit e-mail. Jméno v rodině lze přiřadit pouze jednomu účtu.</p>
+ </form>
+</section>
+<section class="panel hidden" id="welcome">
+ <div class="topbar"><span class="tag" id="currentBadge"></span><button class="secondary" id="logoutButton">Odhlásit se ↗</button></div>
  <h2 id="hello"></h2>
  <p>Vítejte u nás doma. ❤️</p>
  <p class="muted">Máme tu další Vánoce, další společné momenty prožité s naší krásnou rodinou a pár přání, která by nám pod stromečkem vykouzlila úsměv. 😀</p>
  <p>🎁 Pojďme Ježíškovi trochu napovědět.</p>
  <h2>Čí přání dnes objevíme? 🎅</h2>
- <p class="muted">Vyber člena rodiny a podívej se, co by mu letos udělalo radost. 🤩</p>
+ <p class="muted">Vyber člena rodiny a podívej se, co by mu letos udělalo radost. Můžeš přidat přání i někomu jinému.</p>
  <div class="people" id="familyPeople"></div>
  <p class="muted">✨ Ať jsou letošní Vánoce plné radosti, překvapení a hlavně ať jsme všichni zdraví.</p>
 </section>
-
 <section class="panel hidden" id="wishlist">
- <div class="topbar">
-  <button class="secondary" onclick="goHome()">← Zpět k rodině</button>
-  <button class="secondary" onclick="changePerson()">Změnit osobu ↔</button>
- </div>
- <h2 id="listTitle"></h2>
- <p class="muted">Malá inspirace pro Ježíška. 🎅</p>
- <div id="wishList"></div>
- <button onclick="showForm()">＋ Přidat přání</button>
+ <div class="topbar"><button class="secondary" id="backButton">← Zpět k rodině</button><span class="tag" id="listBadge"></span></div>
+ <h2 id="listTitle"></h2><p class="muted">Malá inspirace pro Ježíška. 🎅</p>
+ <div id="wishList"></div><button id="addWishButton">＋ Přidat přání</button>
  <p class="muted">Každé přání začíná malým nápadem.</p>
  <div id="formArea" class="hidden">
-  <h2 id="formTitle">Co by ti pod stromečkem udělalo radost? 🎁</h2>
+  <h2 id="formTitle">Co by udělalo radost? 🎁</h2>
   <form id="wishForm">
    <label>Název přání<input id="wishName" maxlength="150" required></label>
+   <label>Komu přání patří<select id="wishRecipient" required><option>Míša</option><option>Péťa</option><option>Pavlínka</option><option>Míša Jr.</option></select></label>
    <label>Odkaz na dárek<input id="wishLink" type="url" placeholder="https://..."></label>
-   <label>Fotka produktu<input id="wishPhoto" type="url" placeholder="Odkaz na obrázek (volitelné)"></label>
+   <label>Fotka produktu (volitelné)<input id="wishPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/heic"></label>
+   <p class="small">Fotka se nahraje do rodinného úložiště. Doporučená velikost do 5 MB.</p>
    <label>Poznámka<textarea id="wishNote" rows="3" maxlength="1000"></textarea></label>
    <label>Přibližná cena (Kč)<input id="wishPrice" type="number" min="0" step="1"></label>
-   <div class="actions">
-    <button type="submit" id="saveButton">Uložit přání</button>
-    <button type="button" class="secondary" onclick="cancelForm()">Zrušit</button>
-   </div>
+   <div class="actions"><button type="submit" id="saveButton">Uložit přání</button><button type="button" class="secondary" id="cancelButton">Zrušit</button></div>
   </form>
  </div>
 </section>
 </main>
-<footer>
- Největší kouzlo Vánoc není o dárcích, ale o momentech strávených s rodinou. ❤️
- <br><br>Rodovi • Naše Vánoce 2026
- <p class="small">Přání se ukládají v tomto prohlížeči.</p>
-</footer>
+<footer>Největší kouzlo Vánoc není o dárcích, ale o momentech strávených s rodinou. ❤️<br><br>Rodovi • Naše Vánoce 2026<p class="small">Společný rodinný seznam přání • přihlášení je nutné</p></footer>
 <div id="toast"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const family=[
- {name:"Míša",icon:"⚽"},
- {name:"Péťa",icon:"☕"},
- {name:"Pavlínka",icon:"🏋️"},
- {name:"Míša Jr.",icon:"🎮"}
-];
-
-const PEOPLE_KEY="rodovi2026_person";
-const WISHES_KEY="rodovi2026_wishes";
-let currentUser=localStorage.getItem(PEOPLE_KEY)||"";
-let currentList="";
-let editingId=null;
-let toastTimer;
-
-function loadWishes(){
- try{
-  const data=JSON.parse(localStorage.getItem(WISHES_KEY)||"[]");
-  return Array.isArray(data)?data:[];
- }catch{return [];}
+const SUPABASE_URL = 'https://zwkxjzioxzrsasqjsemx.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_7pm8d4TfDW6Nb5N201RJQg_LEob1TMP';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const family=[{name:'Míša',icon:'⚽'},{name:'Péťa',icon:'☕'},{name:'Pavlínka',icon:'🏋️'},{name:'Míša Jr.',icon:'🎮'}];
+let session=null, authUser=null, currentUser='', currentList='', editingId=null, wishes=[], profiles={}, toastTimer=null;
+const $=id=>document.getElementById(id);
+function notify(message){const el=$('toast');el.textContent=message;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',4500)}
+function showOnly(section){['authPanel','welcome','wishlist'].forEach(id=>$(id).classList.toggle('hidden',id!==section))}
+function personButton(person){const b=document.createElement('button');b.className='person';const icon=document.createElement('span');icon.textContent=person.icon;b.append(icon,document.createTextNode(person.name));b.addEventListener('click',()=>openList(person.name));return b}
+function renderPeople(){$('familyPeople').replaceChildren(...family.map(personButton))}
+function setAuthMode(mode){$('loginForm').classList.toggle('hidden',mode!=='login');$('signupForm').classList.toggle('hidden',mode!=='signup');$('showLogin').classList.toggle('secondary',mode!=='login');$('showSignup').classList.toggle('secondary',mode!=='signup')}
+async function ensureProfile(){
+ const {data:existing,error:readError}=await db.from('profiles').select('id,member_name').eq('id',authUser.id).maybeSingle();
+ if(readError)throw readError;
+ if(existing){currentUser=existing.member_name;return;}
+ const chosen=authUser.user_metadata?.member_name;
+ if(!family.some(p=>p.name===chosen))throw new Error('Účet nemá přiřazené rodinné jméno. Kontaktujte správce seznamu.');
+ const {data,error}=await db.from('profiles').insert({id:authUser.id,member_name:chosen}).select('id,member_name').single();
+ if(error)throw new Error(error.code==='23505'?'Toto rodinné jméno už je přiřazeno jinému účtu. Kontaktujte správce seznamu.':error.message);
+ currentUser=data.member_name;
 }
-let wishes=loadWishes();
-
-function persistWishes(){
- try{
-  localStorage.setItem(WISHES_KEY,JSON.stringify(wishes));
-  return true;
- }catch{
-  notify("Nepodařilo se uložit data. Zkontroluj místo v prohlížeči.");
-  return false;
- }
+async function enterApp(){
+ if(!authUser){showOnly('authPanel');return;}
+ try{await ensureProfile();const person=family.find(p=>p.name===currentUser);$('currentBadge').textContent=(person?person.icon+' ':'')+currentUser;$('hello').textContent='Ahoj, '+currentUser+'! ❤️';renderPeople();showOnly('welcome');await loadWishes();}
+ catch(e){console.error(e);notify(e.message||'Nepodařilo se načíst rodinný profil.');showOnly('authPanel')}
 }
-
-function notify(message){
- const el=document.getElementById("toast");
- el.textContent=message;
- el.style.display="block";
- clearTimeout(toastTimer);
- toastTimer=setTimeout(()=>el.style.display="none",3500);
+async function loadWishes(){
+ const {data,error}=await db.from('wishes').select('id,recipient,title,description,image_url,link,price,author_id,created_at,updated_at').order('created_at',{ascending:false});
+ if(error)throw error;
+ wishes=data||[];
+ const {data:people,error:profileError}=await db.from('profiles').select('id,member_name');
+ if(profileError)throw profileError;
+ profiles=Object.fromEntries((people||[]).map(p=>[p.id,p.member_name]));
+ if(!$('wishlist').classList.contains('hidden'))renderWishes();
 }
-
-function personButton(person,handler){
- const button=document.createElement("button");
- button.className="person";
- const icon=document.createElement("span");
- icon.textContent=person.icon;
- button.append(icon,document.createTextNode(person.name));
- button.onclick=handler;
- return button;
-}
-
-function renderPeople(){
- const identity=document.getElementById("identityPeople");
- const familyArea=document.getElementById("familyPeople");
- identity.innerHTML="";
- familyArea.innerHTML="";
- family.forEach(person=>{
-  identity.appendChild(personButton(person,()=>selectPerson(person.name)));
-  familyArea.appendChild(personButton(person,()=>openList(person.name)));
- });
-}
-
-function selectPerson(name){
- currentUser=name;
- localStorage.setItem(PEOPLE_KEY,name);
- document.getElementById("identity").classList.add("hidden");
- document.getElementById("welcome").classList.remove("hidden");
- document.getElementById("wishlist").classList.add("hidden");
- document.getElementById("hello").textContent="Ahoj, "+name+"! ❤️";
- const person=family.find(p=>p.name===name);
- document.getElementById("currentBadge").textContent=(person?person.icon+" ":"")+name;
-}
-
-function changePerson(){
- document.getElementById("welcome").classList.add("hidden");
- document.getElementById("wishlist").classList.add("hidden");
- document.getElementById("identity").classList.remove("hidden");
-}
-
-function openList(name){
- currentList=name;
- document.getElementById("welcome").classList.add("hidden");
- document.getElementById("identity").classList.add("hidden");
- document.getElementById("wishlist").classList.remove("hidden");
- document.getElementById("listTitle").textContent="Vánoční přání pro "+name+" 🎁";
- cancelForm();
- renderWishes();
-}
-
-function goHome(){
- document.getElementById("wishlist").classList.add("hidden");
- document.getElementById("welcome").classList.remove("hidden");
- cancelForm();
-}
-
-function showForm(id=null){
- editingId=id;
- const form=document.getElementById("wishForm");
- form.reset();
- document.getElementById("formArea").classList.remove("hidden");
- document.getElementById("formTitle").textContent=id?"Upravit přání ✏️":"Co by ti pod stromečkem udělalo radost? 🎁";
- document.getElementById("saveButton").textContent=id?"Uložit změny":"Uložit přání";
- if(id){
-  const w=wishes.find(item=>item.id===id);
-  if(!w)return;
-  document.getElementById("wishName").value=w.name;
-  document.getElementById("wishLink").value=w.link||"";
-  document.getElementById("wishPhoto").value=w.photo||"";
-  document.getElementById("wishNote").value=w.note||"";
-  document.getElementById("wishPrice").value=w.price??"";
- }
- document.getElementById("formArea").scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-function cancelForm(){
- editingId=null;
- document.getElementById("formArea").classList.add("hidden");
- document.getElementById("wishForm").reset();
-}
-
-function safeUrl(value){
- if(!value)return "";
- try{
-  const url=new URL(value);
-  return ["https:","http:"].includes(url.protocol)?url.href:"";
- }catch{return "";}
-}
-
-document.getElementById("wishForm").addEventListener("submit",event=>{
- event.preventDefault();
- const name=document.getElementById("wishName").value.trim();
- if(!name||!currentList||!currentUser)return;
- const link=safeUrl(document.getElementById("wishLink").value.trim());
- const photo=safeUrl(document.getElementById("wishPhoto").value.trim());
- const note=document.getElementById("wishNote").value.trim();
- const priceValue=document.getElementById("wishPrice").value;
- const price=priceValue===""?"":Number(priceValue);
-
- if(editingId){
-  const w=wishes.find(item=>item.id===editingId);
-  if(!w)return;
-  w.name=name;w.link=link;w.photo=photo;w.note=note;w.price=price;
-  w.updatedBy=currentUser;
-  if(!persistWishes())return;
-  notify("Přání bylo upraveno. ✨");
- }else{
-  wishes.push({
-   id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),
-   for:currentList,
-   author:currentUser,
-   name,link,photo,note,price,
-   createdAt:new Date().toISOString()
-  });
-  if(!persistWishes()){
-   wishes.pop();
-   return;
-  }
-  notify("Přání dorazilo k Ježíškovi! 🎅");
- }
- cancelForm();
- renderWishes();
-});
-
-function renderWishes(){
- const list=document.getElementById("wishList");
- list.innerHTML="";
- const mine=wishes.filter(w=>w.for===currentList);
- if(!mine.length){
-  const empty=document.createElement("div");
-  empty.innerHTML="<h3>Zatím tu nic není. 🎅</h3><p class='muted'>Přidej první přání a začni psát letošní vánoční seznam.</p>";
-  list.appendChild(empty);
-  return;
- }
- mine.forEach(w=>{
-  const card=document.createElement("article");
-  card.className="wish";
-
-  const title=document.createElement("strong");
-  title.textContent=w.name;
-  card.appendChild(title);
-
-  const recipient=document.createElement("div");
-  recipient.className="tag";
-  recipient.textContent="🎁 Přání pro: "+w.for;
-  card.appendChild(recipient);
-
-  const author=document.createElement("div");
-  author.className="tag";
-  author.textContent="✍️ Přidal/a: "+w.author;
-  card.appendChild(author);
-
-  if(w.note){
-   const note=document.createElement("p");
-   note.className="muted";
-   note.textContent=w.note;
-   card.appendChild(note);
-  }
-  if(w.price!==""&&w.price!==null&&w.price!==undefined){
-   const price=document.createElement("p");
-   price.className="muted";
-   price.textContent="Přibližná cena: "+w.price+" Kč";
-   card.appendChild(price);
-  }
-  if(w.link){
-   const p=document.createElement("p");
-   const a=document.createElement("a");
-   a.href=w.link;a.target="_blank";a.rel="noopener noreferrer";
-   a.textContent="Otevřít dárek ↗";
-   p.appendChild(a);card.appendChild(p);
-  }
-  if(w.photo){
-   const img=document.createElement("img");
-   img.src=w.photo;img.alt=w.name;img.loading="lazy";
-   img.onerror=()=>img.remove();
-   card.appendChild(img);
-  }
-
-  const actions=document.createElement("div");
-  actions.className="actions";
-  const edit=document.createElement("button");
-  edit.textContent="✏️ Upravit";
-  edit.onclick=()=>showForm(w.id);
-  const remove=document.createElement("button");
-  remove.textContent="🗑️ Smazat";
-  remove.className="danger";
-  remove.onclick=()=>{
-   if(!confirm("Opravdu chceš toto přání smazat?"))return;
-   const previous=wishes;
-   wishes=wishes.filter(item=>item.id!==w.id);
-   if(!persistWishes()){wishes=previous;return;}
-   renderWishes();
-   notify("Přání bylo smazáno.");
-  };
-  actions.append(edit,remove);
-  card.appendChild(actions);
-  list.appendChild(card);
- });
-}
-
-renderPeople();
-
-if(family.some(p=>p.name===currentUser)){
- selectPerson(currentUser);
-}else{
- currentUser="";
- localStorage.removeItem(PEOPLE_KEY);
- document.getElementById("identity").classList.remove("hidden");
- document.getElementById("welcome").classList.add("hidden");
- document.getElementById("wishlist").classList.add("hidden");
-}
+async function openList(name){currentList=name;$('listTitle').textContent='Vánoční přání pro '+name+' 🎁';$('listBadge').textContent='🎁 '+name;cancelForm();showOnly('wishlist');try{await loadWishes();renderWishes()}catch(e){console.error(e);notify('Přání se nepodařilo načíst: '+e.message)}}
+function goHome(){cancelForm();showOnly('welcome')}
+function showForm(id=null){editingId=id;$('wishForm').reset();$('wishRecipient').value=currentList;$('formArea').classList.remove('hidden');$('formTitle').textContent=id?'Upravit přání ✏️':'Co by udělalo radost? 🎁';$('saveButton').textContent=id?'Uložit změny':'Uložit přání';if(id){const w=wishes.find(item=>item.id===id);if(!w)return;$('wishName').value=w.title||'';$('wishRecipient').value=w.recipient;$('wishLink').value=w.link||'';$('wishNote').value=w.description||'';$('wishPrice').value=w.price??'';} $('formArea').scrollIntoView({behavior:'smooth',block:'start'})}
+function cancelForm(){editingId=null;$('formArea').classList.add('hidden');$('wishForm').reset()}
+function safeUrl(value){if(!value)return '';try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
+async function uploadPhoto(file){if(!file)return null;if(file.size>5*1024*1024)throw new Error('Fotka musí mít maximálně 5 MB.');const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');const path=`${authUser.id}/${crypto.randomUUID()}.${ext||'jpg'}`;const {error}=await db.storage.from('wish-photos').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg'});if(error)throw error;const {data}=db.storage.from('wish-photos').getPublicUrl(path);return data.publicUrl}
+$('showLogin').addEventListener('click',()=>setAuthMode('login'));$('showSignup').addEventListener('click',()=>setAuthMode('signup'));
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();const button=$('loginForm').querySelector('button[type=submit]');button.disabled=true;try{const {data,error}=await db.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});if(error)throw error;session=data.session;authUser=data.user;await enterApp()}catch(err){notify(err.message||'Přihlášení se nezdařilo.')}finally{button.disabled=false}});
+$('signupForm').addEventListener('submit',async e=>{e.preventDefault();const button=$('signupForm').querySelector('button[type=submit]');button.disabled=true;try{const email=$('signupEmail').value.trim(),password=$('signupPassword').value,name=$('signupName').value;const {data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin,data:{member_name:name}}});if(error)throw error;if(data.session){session=data.session;authUser=data.user;await enterApp()}else{notify('Účet je vytvořen. Potvrď e-mail a potom se přihlas. 📩');setAuthMode('login');$('loginEmail').value=email}}catch(err){notify(err.message||'Registrace se nezdařila.')}finally{button.disabled=false}});
+$('logoutButton').addEventListener('click',async()=>{const {error}=await db.auth.signOut();if(error){notify(error.message);return}session=null;authUser=null;currentUser='';currentList='';showOnly('authPanel');setAuthMode('login');notify('Byl/a jsi odhlášen/a.')});
+$('backButton').addEventListener('click',goHome);$('addWishButton').addEventListener('click',()=>showForm());$('cancelButton').addEventListener('click',cancelForm);
+$('wishForm').addEventListener('submit',async e=>{e.preventDefault();if(!authUser)return;const title=$('wishName').value.trim(),recipient=$('wishRecipient').value,link=safeUrl($('wishLink').value.trim()),description=$('wishNote').value.trim(),priceValue=$('wishPrice').value,price=priceValue===''?null:Number(priceValue),file=$('wishPhoto').files[0];if(!title)return;const button=$('saveButton');button.disabled=true;button.textContent='Ukládám…';try{let image_url=null;if(file)image_url=await uploadPhoto(file);if(editingId){const old=wishes.find(w=>w.id===editingId);if(!old||old.author_id!==authUser.id)throw new Error('Upravovat můžeš jen vlastní přání.');const update={recipient,title,link,description,price,updated_at:new Date().toISOString()};if(image_url)update.image_url=image_url;const {error}=await db.from('wishes').update(update).eq('id',editingId);if(error)throw error;notify('Přání bylo upraveno. ✨')}else{const {error}=await db.from('wishes').insert({recipient,title,link,description,image_url,price,author_id:authUser.id});if(error)throw error;notify('Přání dorazilo k Ježíškovi! 🎅')}cancelForm();await loadWishes();renderWishes()}catch(err){console.error(err);notify('Nepodařilo se uložit přání: '+(err.message||'zkus to znovu'))}finally{button.disabled=false;button.textContent=editingId?'Uložit změny':'Uložit přání'}});
+function renderWishes(){const list=$('wishList');list.replaceChildren();const mine=wishes.filter(w=>w.recipient===currentList);if(!mine.length){const empty=document.createElement('div');empty.innerHTML="<h3>Zatím tu nic není. 🎅</h3><p class='muted'>Přidej první přání a začni psát letošní vánoční seznam.</p>";list.appendChild(empty);return}mine.forEach(w=>{const card=document.createElement('article');card.className='wish';const title=document.createElement('strong');title.textContent=w.title||'Přání bez názvu';card.appendChild(title);const recipient=document.createElement('div');recipient.className='tag';recipient.textContent='🎁 Přání pro: '+w.recipient;card.appendChild(recipient);const author=document.createElement('div');author.className='tag';author.textContent='✍️ Přidal/a: '+(profiles[w.author_id]||'Člen rodiny');card.appendChild(author);if(w.description){const p=document.createElement('p');p.className='muted';p.textContent=w.description;card.appendChild(p)}if(w.price!==null&&w.price!==undefined&&w.price!==''){const p=document.createElement('p');p.className='muted';p.textContent='Přibližná cena: '+w.price+' Kč';card.appendChild(p)}if(w.link){const p=document.createElement('p'),a=document.createElement('a');a.href=w.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Otevřít dárek ↗';p.appendChild(a);card.appendChild(p)}if(w.image_url){const img=document.createElement('img');img.src=w.image_url;img.alt=w.title||'Fotka produktu';img.loading='lazy';img.onerror=()=>img.remove();card.appendChild(img)}if(w.author_id===authUser?.id){const actions=document.createElement('div');actions.className='actions';const edit=document.createElement('button');edit.textContent='✏️ Upravit';edit.addEventListener('click',()=>showForm(w.id));const remove=document.createElement('button');remove.textContent='🗑️ Smazat';remove.className='danger';remove.addEventListener('click',async()=>{if(!confirm('Opravdu chceš toto přání smazat?'))return;const {error}=await db.from('wishes').delete().eq('id',w.id);if(error){notify('Přání se nepodařilo smazat: '+error.message);return}await loadWishes();renderWishes();notify('Přání bylo smazáno.')});actions.append(edit,remove);card.appendChild(actions)}list.appendChild(card)})}
+(async()=>{renderPeople();setAuthMode('login');const {data,error}=await db.auth.getSession();if(error){notify(error.message);return}session=data.session;authUser=session?.user||null;if(authUser){await enterApp()}else showOnly('authPanel');db.auth.onAuthStateChange((_event,newSession)=>{session=newSession;authUser=newSession?.user||null;if(!authUser){showOnly('authPanel')}else{setTimeout(()=>enterApp(),0)}})})();
 </script>
 </body>
 </html>
